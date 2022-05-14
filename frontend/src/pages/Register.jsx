@@ -4,7 +4,7 @@ import { FaUser } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
 import { register, reset } from '../features/auth/authSlice';
-
+import Spinner from '../components/Spinner';
 function Register() {
   const [formData, setFormData] = useState({
     name: '',
@@ -116,6 +116,7 @@ function Register() {
             <button className='btn btn-block'>Submit</button>
           </div>
         </form>
+        {isLoading && <Spinner />}
       </section>
     </>
   );
