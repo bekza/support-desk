@@ -6,14 +6,40 @@ const Ticket = require('../models/ticketModel');
 // @route   Get /api/tickets
 // @access  Private
 const getTickets = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: 'Get tickets' });
+  // Get user using the id in the JWT
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    res.status(400);
+    throw new Error('User not found');
+  }
+  const tickets = await Ticket.find({ user: req.user.id });
+  res.status(200).json(tickets);
 });
 
 // @desc    Create new tickets
 // @route   POST /api/tickets
 // @access  Private
 const createTicket = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: 'Create ticket' });
+  const { product, description } = req.body;
+  if (!product || !description) {
+    res.status(400);
+    throw new Error('Please add product and description');
+  }
+
+  // Get user using the id in the JWT
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(400);
+    throw new Error('User not found');
+  }
+  const ticket = await Ticket.create({
+    product,
+    description,
+    user: user.id,
+    status: 'new',
+  });
+  res.status(201).json(ticket);
 });
 
 module.exports = {
