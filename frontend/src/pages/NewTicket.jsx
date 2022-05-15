@@ -3,13 +3,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { createTicket, reset } from '../features/tickets/ticketSlice';
-import Spinner from './Spinner';
-import BackButton from './BackButton';
+import Spinner from '../components/Spinner';
+import BackButton from '../components/BackButton';
 
 const NewTicket = () => {
   const { user } = useSelector((state) => state.auth);
   const { isLoading, isError, message, isSuccess } = useSelector(
-    (state) => state.ticket
+    (state) => state.tickets
   );
 
   const [name] = useState(user.name);
@@ -36,13 +36,10 @@ const NewTicket = () => {
     dispatch(createTicket({ product, description }));
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
-
   return (
     <>
       <BackButton url='/' />
+      {isLoading && <Spinner />}
       <section className='heading'>
         <h1>Create New Ticket</h1>
         <p>Please fill out the form bellow</p>

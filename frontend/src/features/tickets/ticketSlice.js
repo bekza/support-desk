@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 import ticketService from './ticketService';
 
@@ -17,8 +18,26 @@ export const createTicket = createAsyncThunk(
   async (ticketData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      console.log('token => ', token);
       return await ticketService.createTicket(ticketData, token);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Get tickets
+export const getTickets = createAsyncThunk(
+  'tickets/getAll',
+  async (_, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await ticketService.getTickets(token);
     } catch (error) {
       const message =
         (error.response &&
@@ -46,6 +65,19 @@ export const ticketSlice = createSlice({
       state.isSuccess = true;
     });
     builder.addCase(createTicket.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.message = action.payload;
+    });
+    builder.addCase(getTickets.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(getTickets.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = true;
+      state.tickets = action.payload;
+    });
+    builder.addCase(getTickets.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
       state.message = action.payload;
