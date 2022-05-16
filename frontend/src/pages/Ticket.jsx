@@ -2,13 +2,18 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getTicket, reset, closeTicket } from '../features/tickets/ticketSlice';
+import { getNotes, reset as notesReset } from '../features/notes/noteSlice';
 import BackButton from '../components/BackButton';
 import Spinner from '../components/Spinner';
+import NoteItem from '../components/NoteItem';
 import { toast } from 'react-toastify';
 
 function Ticket() {
   const { ticket, isLoading, isSuccess, isError, message } = useSelector(
     (state) => state.tickets
+  );
+  const { notes, isLoading: notesIsLoading } = useSelector(
+    (state) => state.notes
   );
   const { ticketId } = useParams();
   const dispatch = useDispatch();
@@ -19,6 +24,7 @@ function Ticket() {
       toast.error(message);
     }
     dispatch(getTicket(ticketId));
+    dispatch(getNotes(ticketId));
     // eslint-disable-next-line
   }, [isError, message, ticketId]);
 
@@ -34,7 +40,7 @@ function Ticket() {
   };
   return (
     <div className='ticket-page'>
-      {isLoading && <Spinner />}{' '}
+      {(isLoading || notesIsLoading) && <Spinner />}
       <header className='ticket-header'>
         <BackButton url='/tickets' />
         <h2>
@@ -52,7 +58,11 @@ function Ticket() {
           <h3>Description of Issue</h3>
           <p>{ticket.description}</p>
         </div>
+        <h2>Notes</h2>
       </header>
+      {notes.map((note) => {
+        return <NoteItem key={note._id} note={note} />;
+      })}
       {ticket.status !== 'closed' ? (
         <button className='btn btn-danger' onClick={onTicketClose}>
           Close Ticket
