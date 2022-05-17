@@ -6,7 +6,7 @@ function NoteItem({ note }) {
     <div
       className='note'
       style={{
-        backgroundColor: note.isStaff ? 'grey' : 'white',
+        backgroundColor: note.isStaff ? '#E94949' : 'white',
         color: note.isStaff ? 'white' : 'black',
       }}
     >
